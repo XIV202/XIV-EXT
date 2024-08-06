@@ -10,9 +10,47 @@
 <div class="chat-container">
     <div class="messages" id="messages">
     </div>
-    <input type="text" id="messageInput" placeholder="Введите сощение...">
+    <input type="text" id="messageInput" placeholder="Введите сообщение...">
     <button onclick="sendMessage()">Отправить</button>
 </div>
-<script src="script.js"></script>
+<script>
+function sendMessage() {
+    const messageInput = document.getElementById('messageInput').value;
+    
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'messages.php', true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            console.log(xhr.responseText);
+            getMessages();
+        }
+    };
+    xhr.send('message=' + messageInput);
+}
+
+function getMessages() {
+    const messageContainer = document.getElementById('messages');
+    
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'messages.php', true);
+    
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            const messages = JSON.parse(xhr.responseText);
+            messageContainer.innerHTML = '';
+            messages.forEach(message => {
+                const newMessage = document.createElement('div');
+                newMessage.textContent = message;
+                messageContainer.appendChild(newMessage);
+            });
+        }
+    };
+
+    xhr.send();
+}
+
+getMessages();
+</script>
 </body>
 </html>
